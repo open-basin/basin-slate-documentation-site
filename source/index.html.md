@@ -1,15 +1,13 @@
 ---
-title: API Reference
+title: Open Basin Documentation
 
 language_tabs: # must be one of https://git.io/vQNgJ
   - shell
-  - ruby
-  - python
   - javascript
+  - swift
 
 toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
-  - <a href='https://github.com/slatedocs/slate'>Documentation Powered by Slate</a>
+  - <a href='https://dashboard.openbasin.io/standards'>Sign Up for Developer Keys</a>
 
 includes:
   - errors
@@ -20,46 +18,56 @@ code_clipboard: true
 
 meta:
   - name: description
-    content: Documentation for the Kittn API
+    content: Documentation for the Open Basin API
 ---
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+Welcome to the Open Basin API! You can use our API to access the Open Basin endpoints, which enables your users to access their data in your applications.
 
 We have language bindings in Shell, Ruby, Python, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
-
-This example API documentation page was created with [Slate](https://github.com/slatedocs/slate). Feel free to edit it and use it as a base for your own API's documentation.
 
 # Authentication
 
 > To authorize, use this code:
 
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-```
-
 ```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here" \
-  -H "Authorization: meowmeowmeow"
+# With shell, you can just pass the correct headers and
+# parameters with each request.
+curl "openbasin.io/*" \
+  -H Authorization: "Bearer ${API_KEY}"
+  -d provider_id="${PROVIDER_ID}" \
+  -d provider_address="${PROVIDER_ADDRESS}"
 ```
 
 ```javascript
-const kittn = require('kittn');
+import { initializeApp } from "open-basin";
 
-let api = kittn.authorize('meowmeowmeow');
+const config = {
+        network: "MUMBAI",
+        provider: {
+            id: ${PROVIDER_ID},
+            address: ${PROVIDER_ADDRESS},
+            key: ${API_KEY}
+        }
+}
+
+const basin = initializeApp(config);
+
+export default basin;
 ```
 
-> Make sure to replace `meowmeowmeow` with your API key.
+```swift
+import OpenBasin
+
+Basin.configure(for: .mumbai,
+                id: ${PROVIDER_ID},
+                address: ${PROVIDER_ADDRESS},
+                key: ${API_KEY})
+```
+
+
+> Make sure to replace `${}` with the proper values.
 
 Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
 
