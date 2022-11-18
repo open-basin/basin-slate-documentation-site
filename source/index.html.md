@@ -7,7 +7,7 @@ language_tabs: # must be one of https://git.io/vQNgJ
   - swift
 
 toc_footers:
-  - <a href='https://dashboard.openbasin.io/standards'>Sign Up for Developer Keys</a>
+  - <a href='https://dashboard.openbasin.io'>Sign Up for Developer Keys</a>
 
 includes:
   - errors
@@ -25,7 +25,7 @@ meta:
 
 Welcome to the Open Basin API! You can use our API to access the Open Basin endpoints, which enables your users to access their data in your applications.
 
-We have language bindings in Shell, Ruby, Python, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
+We have language bindings in Shell, JavaScripts, and Swift! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
 
 # Authentication
 
@@ -69,44 +69,37 @@ Basin.configure(for: .mumbai,
 
 > Make sure to replace `${}` with the proper values.
 
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
+Open Basin uses API keys, Public Addresses, and IDs to allow access to the API. You can register for new Open Basin keys at our [developer portal](https://dashboard.openbasin.io).
 
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
+Open Basin expects for the API key to be included in the header and the Address and ID in the parameters of all API requests to the server that looks like the following:
 
-`Authorization: meowmeowmeow`
+`Authorization: ${API_KEY}`
+`provider_address: ${PROVIDER_ID}`
+`provider_id: ${PROVIDER_ADDRESS}`
 
 <aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
+You must replace <code>${}</code> with your personal keys.
 </aside>
 
-# Kittens
+# Standards
 
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
+## Get All Standards
 
 ```shell
-curl "http://example.com/api/kittens" \
-  -H "Authorization: meowmeowmeow"
+# With shell, you can just pass the correct headers and
+# parameters with each request.
+curl "openbasin.io/*" \
+  -H Authorization: "Bearer ${API_KEY}"
+  -d provider_id="${PROVIDER_ID}" \
+  -d provider_address="${PROVIDER_ADDRESS}"
 ```
 
 ```javascript
-const kittn = require('kittn');
 
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
+```
+
+```swift
+
 ```
 
 > The above command returns JSON structured like this:
@@ -114,140 +107,77 @@ let kittens = api.kittens.get();
 ```json
 [
   {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
+    "standard": {
+      "id": string,
+      "minter": address,
+      "name": string,
+      "schema": any,
+      "timestamp": date,
+      "token": number
+    },
+    "standard_id": string
   }
 ]
 ```
 
-This endpoint retrieves all kittens.
+This endpoint retrieves all standards.
 
 ### HTTP Request
 
-`GET http://example.com/api/kittens`
+`GET api.openbasin.io/datastore/standards/all/standards`
 
 ### Query Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
+No extra.
 
 <aside class="success">
-Remember — a happy kitten is an authenticated kitten!
+Note — these data standards will never change.
 </aside>
 
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
+## Get a Specific Standard
 
 ```shell
-curl "http://example.com/api/kittens/2" \
-  -H "Authorization: meowmeowmeow"
+# With shell, you can just pass the correct headers and
+# parameters with each request.
+curl "openbasin.io/*" \
+  -H Authorization: "Bearer ${API_KEY}"
+  -d provider_id="${PROVIDER_ID}" \
+  -d provider_address="${PROVIDER_ADDRESS}"
+  -d id="${STANDARD_ID}"
 ```
 
 ```javascript
-const kittn = require('kittn');
 
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
+```
+
+```swift
+
 ```
 
 > The above command returns JSON structured like this:
 
 ```json
 {
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
+  "id": string,
+  "minter": address,
+  "name": string,
+  "schema": any,
+  "timestamp": date,
+  "token": number
 }
 ```
 
 This endpoint retrieves a specific kitten.
 
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
-
 ### HTTP Request
 
-`GET http://example.com/kittens/<ID>`
+`GET api.openbasin.io/datastore/standard`
 
 ### URL Parameters
 
 Parameter | Description
 --------- | -----------
-ID | The ID of the kitten to retrieve
+id | The ID of the standard to retrieve
 
-## Delete a Specific Kitten
 
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2" \
-  -X DELETE \
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.delete(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "deleted" : ":("
-}
-```
-
-This endpoint deletes a specific kitten.
-
-### HTTP Request
-
-`DELETE http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to delete
-
+<aside class="warning">This documentation site is a work in progress, please reach out to the <code>&lt;maintainers&gt;</code> for more information.</aside>
