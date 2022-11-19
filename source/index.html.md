@@ -23,11 +23,15 @@ meta:
 
 # Introduction
 
+<aside>
+Open Basin is currently in <code>beta</code>.
+</aside>
+
 Welcome to the Open Basin API! You can use our API to access the Open Basin endpoints, which enables your users to access their data in your applications.
 
 We have language bindings in Shell, JavaScripts, and Swift! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
 
-# Authentication
+# Get Started
 
 > To authorize, use this code:
 
@@ -41,6 +45,8 @@ curl "openbasin.io/*" \
 ```
 
 ```javascript
+// basin.js
+
 import { initializeApp } from "open-basin";
 
 const config = {
@@ -58,6 +64,8 @@ export default basin;
 ```
 
 ```swift
+// AppDelegate.swift
+
 import OpenBasin
 
 Basin.configure(for: .mumbai,
@@ -74,12 +82,28 @@ Open Basin uses API keys, Public Addresses, and IDs to allow access to the API. 
 Open Basin expects for the API key to be included in the header and the Address and ID in the parameters of all API requests to the server that looks like the following:
 
 `Authorization: ${API_KEY}`
+
 `provider_address: ${PROVIDER_ID}`
+
 `provider_id: ${PROVIDER_ADDRESS}`
 
-<aside class="notice">
-You must replace <code>${}</code> with your personal keys.
-</aside>
+# Understanding Open Basin
+
+Open Basin is a structured data lake that anyone can read or write to. All data stored on Open Basin is owned by aa single or multiple addresses. Although it is an open system, to access the data you will need explicit permission from one of the owners of the data.
+
+## How it works
+
+All data on Open Basin is stored on IPFS and structured on Ethereum.
+
+## Glossary
+
+Term | Description
+--------- | -----------
+Owner | Has complete control over their data by providing and revoking permissions to their data.
+Provider | Reads and writes data on behalf of the owners. Providers can only work with data as the owners see fit.
+Standard | Valid JSON Schema to enforce a specified data structure. When storing data on Open Basin, all data must be validated against its corresponding standard.
+
+<aside class="notice">For more information or clarity, join our <a href="https://discord.com/invite/M3NdGXgS">Discord server</a> to chat with us.</aside>
 
 # Standards
 
