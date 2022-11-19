@@ -33,16 +33,7 @@ We have language bindings in Shell, JavaScripts, and Swift! You can view code ex
 
 # Get Started
 
-> To authorize, use this code:
-
-```shell
-# With shell, you can just pass the correct headers and
-# parameters with each request.
-curl "openbasin.io/*" \
-  -H Authorization: "Bearer ${API_KEY}"
-  -d provider_id="${PROVIDER_ID}" \
-  -d provider_address="${PROVIDER_ADDRESS}"
-```
+> To setup configuration, use this code:
 
 ```javascript
 // basin.js
@@ -74,6 +65,14 @@ Basin.configure(for: .mumbai,
                 key: ${API_KEY})
 ```
 
+```shell
+# With shell, you can just pass the correct headers and
+# parameters with each request.
+curl "api.openbasin.io/*" \
+  -H Authorization: "Bearer ${API_KEY}" \
+  -d provider_id: "${PROVIDER_ID}" \
+  -d provider_address: "${PROVIDER_ADDRESS}"
+```
 
 > Make sure to replace `${}` with the proper values.
 
@@ -113,6 +112,11 @@ Bucket | A set of validated data where owners pool data of the same type or cate
 
 # Authentication
 
+> Will use User Profile for examples:
+
+
+In order to interact with data on Open Basin, owners must allow you to do so.
+
 ## Request Permissions
 
 ## Remove Permissions
@@ -121,28 +125,183 @@ Bucket | A set of validated data where owners pool data of the same type or cate
 
 # Standards
 
+Standards are a valid JSON schema that enforces structure and format of data.
+
+### Properties
+
+`id: string` - A unique identifier
+
+`minter: address` - The address of the provider that minted the standard
+
+`name: string` - The name of the standard
+
+`timestamp: date` - The date and time at which the standard was minted
+
+`schema: JSON Schema` - The schema used to validate data against
+
+<aside class="notice">View deployed standards on the <a href="https://dashboard.openbasin.io/standards">Open Basin dashboard</a>.</aside>
+
 ## Mint Standards
+
+```javascript
+await basin.api.mint.standard(
+  "profile_v0",
+  "profile",
+  {
+        "$schema": "http://json-schema.org/draft-06/schema#",
+        "$ref": "#/definitions/profile_v0",
+        "definitions": {
+            "profile_v0": {
+                "type": "object",
+                "additionalProperties": {},
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "image": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name",
+                    "image"
+                ],
+                "title": "profile_v0",
+                "description": "Your core prfile data."
+            }
+        }
+    }
+);
+```
+
+```swift
+import OpenBasin
+
+Basin.mint.standard(id: "",
+                    name: "",
+                    schema: [
+                        "$schema": "http://json-schema.org/draft-06/schema#",
+                        "$ref": "#/definitions/profile_v0",
+                        "definitions": [
+                            "profile_v0": [
+                                "type": "object",
+                                "additionalProperties": [:],
+                                "properties": [
+                                    "name": [
+                                        "type": "string"
+                                    ],
+                                    "image": [
+                                        "type": "string"
+                                    ]
+                                ],
+                                "required": [
+                                    "name",
+                                    "image"
+                                ],
+                                "title": "profile_v0",
+                                "description": "Your core profile data."
+                            ]
+                        ]
+                    ])
+{ result in
+    print("")
+}
+```
+
+```shell
+curl "api.openbasin.io/datastore/standard/mint" \
+  -H Authorization: "Bearer ${API_KEY}" \
+  -d provider_id: "${PROVIDER_ID}" \
+  -d provider_address: "${PROVIDER_ADDRESS}" \
+  -d id: "profile_v0" \
+  -d name: "profile" \
+  -d schema: {
+    "id": "profile_v0",
+    "name": "profile",
+    "schema": {
+        "$schema": "http://json-schema.org/draft-06/schema#",
+        "$ref": "#/definitions/profile_v0",
+        "definitions": {
+            "profile_v0": {
+                "type": "object",
+                "additionalProperties": {},
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "image": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name",
+                    "image"
+                ],
+                "title": "profile_v0",
+                "description": "Your core prfile data."
+            }
+        }
+    }
+}
+```
+
+> The above command returns JSON structured like below:
+
+```json
+{
+  "status": "success"
+}
+```
+
+Creates a Standard and stores on Open Basin
+
+### HTTP Request
+
+`POST api.openbasin.io/datastore/standard/mint`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+id | The ID of the standard to mint
+name | The name of the standard
+schema | The JSON schema of the standard
+
+<aside class="success">
+Note — Standards are immutable.
+</aside>
 
 ## Get Standards
 
+```javascript
+import basin from './basin.js';
+
+const standards = await basin.api.standards.all.get();
+
+console.log(standards);
+```
+
+```swift
+import OpenBasin
+
+Basin.api.standards.all.getStandards { result in
+    switch result {
+    case .success(let standards)
+        print(standards)
+    case .error(let error)
+        print(error)
+    }
+}
+```
+
 ```shell
-# With shell, you can just pass the correct headers and
-# parameters with each request.
-curl "openbasin.io/*" \
-  -H Authorization: "Bearer ${API_KEY}"
+curl "api.openbasin.io/datastore/standards/all/standards" \
+  -H Authorization: "Bearer ${API_KEY}" \
   -d provider_id="${PROVIDER_ID}" \
   -d provider_address="${PROVIDER_ADDRESS}"
 ```
 
-```javascript
-
-```
-
-```swift
-
-```
-
-> The above command returns JSON structured like this:
+> The above command returns JSON structured like below:
 
 ```json
 [
@@ -168,30 +327,37 @@ This endpoint retrieves all standards.
 
 ### Query Parameters
 
-No extra.
-
-<aside class="success">
-Note — these data standards will never change.
-</aside>
+No additional parameters
 
 ## Get a Specific Standard
 
-```shell
-# With shell, you can just pass the correct headers and
-# parameters with each request.
-curl "openbasin.io/*" \
-  -H Authorization: "Bearer ${API_KEY}"
-  -d provider_id="${PROVIDER_ID}" \
-  -d provider_address="${PROVIDER_ADDRESS}"
-  -d id="${STANDARD_ID}"
-```
-
 ```javascript
+import basin from './basin.js';
 
+const standard = await basin.api.standard("profile_v0").get();
+
+console.log(standard)
 ```
 
 ```swift
+import OpenBasin
 
+Basin.api.standard("profile_v0").getStandard { result in
+    switch result {
+    case .success(let standard)
+        print(standard)
+    case .error(let error)
+        print(error)
+    }
+}
+```
+
+```shell
+curl "api.openbasin.io/*" \
+  -H Authorization: "Bearer ${API_KEY}" \
+  -d provider_id: "${PROVIDER_ID}" \ \
+  -d provider_address: "${PROVIDER_ADDRESS}" \
+  -d id: "profile_v0"
 ```
 
 > The above command returns JSON structured like this:
@@ -207,7 +373,7 @@ curl "openbasin.io/*" \
 }
 ```
 
-This endpoint retrieves a specific kitten.
+This endpoint retrieves a specific Standard.
 
 ### HTTP Request
 
