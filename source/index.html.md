@@ -257,7 +257,7 @@ curl "api.openbasin.io/datastore/standard/mint" \
 
 ```json
 {
-  "status": "success"
+    "status": "success"
 }
 ```
 
@@ -267,7 +267,7 @@ Creates a Standard and stores on Open Basin
 
 `POST api.openbasin.io/datastore/standard/mint`
 
-### URL Parameters
+### Query Parameters
 
 Parameter | Description
 --------- | -----------
@@ -292,7 +292,7 @@ console.log(standards);
 ```swift
 import OpenBasin
 
-Basin.api.standards.all.getStandards { result in
+Basin.api.standards.getAllStandards { result in
     switch result {
     case .success(let standards)
         print(standards)
@@ -313,17 +313,17 @@ curl "api.openbasin.io/datastore/standards/all/standards" \
 
 ```json
 [
-  {
-    "standard": {
-      "id": string,
-      "minter": address,
-      "name": string,
-      "schema": any,
-      "timestamp": date,
-      "token": number
-    },
-    "standard_id": string
-  }
+    {
+        "standard": {
+        "id": string,
+        "minter": address,
+        "name": string,
+        "schema": any,
+        "timestamp": date,
+        "token": number
+        },
+        "standard_id": string
+    }
 ]
 ```
 
@@ -361,9 +361,9 @@ Basin.api.standard("profile_v0").getStandard { result in
 ```
 
 ```shell
-curl "api.openbasin.io/*" \
+curl "api.openbasin.io/datastore/standard" \
     -H Authorization: "Bearer ${API_KEY}" \
-    -d provider_id: "${PROVIDER_ID}" \ \
+    -d provider_id: "${PROVIDER_ID}"\
     -d provider_address: "${PROVIDER_ADDRESS}" \
     -d id: "profile_v0"
 ```
@@ -372,12 +372,12 @@ curl "api.openbasin.io/*" \
 
 ```json
 {
-  "id": string,
-  "minter": address,
-  "name": string,
-  "schema": any,
-  "timestamp": date,
-  "token": number
+    "id": string,
+    "minter": address,
+    "name": string,
+    "schema": any,
+    "timestamp": date,
+    "token": number
 }
 ```
 
@@ -387,7 +387,7 @@ This endpoint retrieves a specific Standard.
 
 `GET api.openbasin.io/datastore/standard`
 
-### URL Parameters
+### Query Parameters
 
 Parameter | Description
 --------- | -----------
@@ -457,7 +457,7 @@ curl "api.openbasin.io/datastore/bucket/mint" \
 
 ```json
 {
-  "status": "success"
+    "status": "success"
 }
 ```
 
@@ -467,7 +467,7 @@ Creates a Bucket and stores on Open Basin
 
 `POST api.openbasin.io/datastore/bucket/mint`
 
-### URL Parameters
+### Query Parameters
 
 Parameter | Description
 --------- | -----------
@@ -518,7 +518,7 @@ curl "api.openbasin.io/datastore/bucket/standard/append" \
 
 ```json
 {
-  "status": "success"
+    "status": "success"
 }
 ```
 
@@ -528,7 +528,7 @@ Appends a new standard to the bucket's standard whitelist.
 
 `POST api.openbasin.io/datastore/bucket/standard/append`
 
-### URL Parameters
+### Query Parameters
 
 Parameter | Description
 --------- | -----------
@@ -537,13 +537,125 @@ standard | The standard to append
 
 ## Get Buckets
 
+```javascript
+import basin from './basin.js';
+
+const buckets = await basin.api.buckets.all.get();
+
+console.log(buckets);
+```
+
+```swift
+import OpenBasin
+
+Basin.api.buckets.getAll { result in
+    switch result {
+    case .success(let buckets)
+        print(buckets)
+    case .error(let error)
+        print(error)
+    }
+}
+```
+
+```shell
+curl "api.openbasin.io/datastore/buckets/all" \
+    -H Authorization: "Bearer ${API_KEY}" \
+    -d provider_id="${PROVIDER_ID}" \
+    -d provider_address="${PROVIDER_ADDRESS}"
+```
+
+> The above command returns JSON structured like below:
+
+```json
+[
+    {
+        "standard": {
+            "id": string,
+            "minter": address,
+            "name": string,
+            "description": string,
+            "timestamp": date,
+            "allowed_standards": string[]
+        },
+        "standard_id": string
+    }
+]
+```
+
+This endpoint retrieves all buckets
+
+### HTTP Request
+
+`GET api.openbasin.io/datastore/buckets/all`
+
+### Query Parameters
+
+No additional parameters
+
+## Get a Specific Bucket
+
+```javascript
+import basin from './basin.js';
+
+const bucket = await basin.api.bucket("public_profiles").get();
+
+console.log(bucket)
+```
+
+```swift
+import OpenBasin
+
+Basin.api.bucket("public_profiles").getBucket { result in
+    switch result {
+    case .success(let bucket)
+        print(bucket)
+    case .error(let error)
+        print(error)
+    }
+}
+```
+
+```shell
+curl "api.openbasin.io/datastore/bucket" \
+    -H Authorization: "Bearer ${API_KEY}" \
+    -d provider_id: "${PROVIDER_ID}"\
+    -d provider_address: "${PROVIDER_ADDRESS}" \
+    -d id: "public_profiles"
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+    "id": string,
+    "minter": address,
+    "name": string,
+    "description": string,
+    "timestamp": date,
+    "allowed_standards": string[]
+}
+```
+
+This endpoint retrieves a specific bucket.
+
+### HTTP Request
+
+`GET api.openbasin.io/datastore/bucket`
+
+### Query Parameters
+
+Parameter | Description
+--------- | -----------
+id | The ID of the bucket to retrieve
+
 # Documents
 
 Documents are wrapper objects for raw data to hold the metadata of the data. They are stored within buckets and conform to a specified standard
 
 ### Properties
 
-`token: integer` - The token index of the document within its bucket
+`token: number` - The token index of the document within its bucket
 
 `owners: address[]` - The set of owners of the document
 
@@ -557,8 +669,269 @@ Documents are wrapper objects for raw data to hold the metadata of the data. The
 
 ## Mint Document
 
+```javascript
+import basin from './basin.js';
+
+await basin.mint.document(
+    ["${OWNER_ADDRESS}"],
+    "public_profiles",
+    "profile_v0",
+    {
+        "name": "Drillbit Taylor",
+        "image": "https://tiny.one/emmet"
+    }
+);
+```
+
+```swift
+import OpenBasin
+
+Basin.mint
+    .document(owners: ["${OWNER_ADDRESS}"],
+              bucket: "public_profiles",
+              standard: "profile_v0",
+              data: [
+                  "name": "Drillbit Taylor",
+                  "image": "https://tiny.one/emmet"
+              ]) { result in
+                  switch result {
+                  case .success(let response)
+                      print(response)
+                  case .error(let error)
+                      print(error)
+                  }
+              }
+```
+
+```shell
+curl "api.openbasin.io/datastore/document/mint" \
+    -H Authorization: "Bearer ${API_KEY}" \
+    -d provider_id: "${PROVIDER_ID}" \
+    -d provider_address: "${PROVIDER_ADDRESS}" \
+    -d owners: ["${OWNER_ADDRESS}"] \
+    -d bucket: "public_profiles" \
+    -d standard: "profile_v0" \
+    -d data: {
+        "name": "Drillbit Taylor",
+        "image": "https://tiny.one/emmet"
+    }
+```
+
+> The above command returns JSON structured like below:
+
+```json
+{
+    "status": "success"
+}
+```
+
+Creates a Document and stores on Open Basin
+
+### HTTP Request
+
+`POST api.openbasin.io/datastore/document/mint`
+
+### Query Parameters
+
+Parameter | Description
+--------- | -----------
+bucket | The id of the document's bucket
+standard | The id of the document's standard
+owners | The list of owners of the document
+data | The raw JSON to store
+
+<aside class="success">
+Note — Document's raw data can be updated.
+</aside>
+
 ## Update Document
 
-## Read Document
+```javascript
+import basin from './basin.js';
 
-<aside class="warning">This documentation site is a work in progress, please reach out to the <code>&lt;maintainers&gt;</code> for more information.</aside>
+await basin.mint.updateDocument(
+    "public_profiles",
+    0,
+    "profile_v0",
+    {
+        "name": "Alamo Taylor",
+        "image": "https://tiny.one/emmet"
+    }
+);
+```
+
+```swift
+import OpenBasin
+
+Basin.mint
+    .updateDocument(bucket: "public_profiles",
+                    document: 0,
+                    standard: "profile_v0",
+                    data: [
+                        "name": "Alamo Taylor"
+                        "image": "https://tiny.one/emmet"
+                    ]) { result in
+                        switch result {
+                        case .success(let response)
+                            print(response)
+                        case .error(let error)
+                            print(error)
+                        }
+                    }
+```
+
+```shell
+curl "api.openbasin.io/datastore/document/update" \
+    -H Authorization: "Bearer ${API_KEY}" \
+    -d provider_id: "${PROVIDER_ID}" \
+    -d provider_address: "${PROVIDER_ADDRESS}" \
+    -d bucket: "public_profiles" \
+    -d standard: "profile_v0" \
+    -d document: "0"
+    -d data: {
+        "name": "Alamo Taylor",
+        "image": "https://tiny.one/emmet"
+    }
+```
+
+> The above command returns JSON structured like below:
+
+```json
+{
+    "status": "success"
+}
+```
+
+Updates the raw value of the document
+
+### HTTP Request
+
+`POST api.openbasin.io/datastore/document/update`
+
+### Query Parameters
+
+Parameter | Description
+--------- | -----------
+document | The token of the document
+bucket | The id of the document's bucket
+standard | The id of the document's standard
+data | The raw JSON to replace the current data
+
+## Get Owner Documents in Bucket
+
+```javascript
+import basin from './basin.js';
+
+const documents = await basin.api.bucket("public_profiles").owner("${OWNER_ADDRESS}").documents();
+
+console.log(documents)
+```
+
+```swift
+import OpenBasin
+
+Basin.api.bucket("public_profiles").owner("${OWNER_ADDRESS}").getDocuments { result in
+    switch result {
+    case .success(let documents)
+        print(documents)
+    case .error(let error)
+        print(error)
+    }
+}
+```
+
+```shell
+curl "api.openbasin.io/datastore/bucket/owner/documents" \
+    -H Authorization: "Bearer ${API_KEY}" \
+    -d provider_id: "${PROVIDER_ID}" \
+    -d provider_address: "${PROVIDER_ADDRESS}" \
+    -d owner: "${OWNER_ADDRESS}" \
+    -d bucket: "public_profiles"
+```
+
+> The above command returns JSON structured like this:
+
+```json
+[
+    "document": {
+        "token": number,
+        "bucket": address,
+        "standard": string,
+        "owners": address[],
+        "timestamp": date,
+        "data": JSON
+    },
+    "document_token": number
+]
+```
+
+Retrieves all documents in a bucket owner by a specific address
+
+### HTTP Request
+
+`GET api.openbasin.io/datastore/bucket/owner/document`
+
+### Query Parameters
+
+Parameter | Description
+--------- | -----------
+owner | The address of the owner
+bucket | The id of the specified bucket
+
+## Get Specific Document
+
+```javascript
+import basin from './basin.js';
+
+const document = await basin.api.bucket("public_profiles").document(0).get();
+
+console.log(document)
+```
+
+```swift
+import OpenBasin
+
+Basin.api.bucket("public_profiles").document(0).getDocument { result in
+    switch result {
+    case .success(let document)
+        print(document)
+    case .error(let error)
+        print(error)
+    }
+}
+```
+
+```shell
+curl "api.openbasin.io/datastore/document" \
+    -H Authorization: "Bearer ${API_KEY}" \
+    -d provider_id: "${PROVIDER_ID}"\
+    -d provider_address: "${PROVIDER_ADDRESS}" \
+    -d token: "0" \
+    -d bucket: "public_profiles"
+```
+
+> The above command returns JSON structured like this:
+
+```json
+{
+    "token": number,
+    "bucket": address,
+    "standard": string,
+    "owners": address[],
+    "timestamp": date,
+    "data": JSON
+}
+```
+
+Updates the raw value of the document
+
+### HTTP Request
+
+`GET api.openbasin.io/datastore/document`
+
+### Query Parameters
+
+Parameter | Description
+--------- | -----------
+token | The token of the document
+bucket | The id of the document's bucket
