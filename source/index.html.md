@@ -2,9 +2,9 @@
 title: Open Basin Documentation
 
 language_tabs: # must be one of https://git.io/vQNgJ
-  - shell
   - javascript
   - swift
+  - shell
 
 toc_footers:
   - <a href='https://dashboard.openbasin.io'>Sign Up for Developer Keys</a>
@@ -145,10 +145,12 @@ Standards are a valid JSON schema that enforces structure and format of data.
 ## Mint Standards
 
 ```javascript
-await basin.api.mint.standard(
-  "profile_v0",
-  "profile",
-  {
+import basin from './basin.js';
+
+await basin.mint.standard(
+    "profile_v0",
+    "profile",
+    {
         "$schema": "http://json-schema.org/draft-06/schema#",
         "$ref": "#/definitions/profile_v0",
         "definitions": {
@@ -178,8 +180,8 @@ await basin.api.mint.standard(
 ```swift
 import OpenBasin
 
-Basin.mint.standard(id: "",
-                    name: "",
+Basin.mint.standard(id: "profile_v0",
+                    name: "profile",
                     schema: [
                         "$schema": "http://json-schema.org/draft-06/schema#",
                         "$ref": "#/definitions/profile_v0",
@@ -205,45 +207,50 @@ Basin.mint.standard(id: "",
                         ]
                     ])
 { result in
-    print("")
+    switch result {
+    case .success(let response)
+        print(response)
+    case .error(let error)
+        print(error)
+    }
 }
 ```
 
 ```shell
 curl "api.openbasin.io/datastore/standard/mint" \
-  -H Authorization: "Bearer ${API_KEY}" \
-  -d provider_id: "${PROVIDER_ID}" \
-  -d provider_address: "${PROVIDER_ADDRESS}" \
-  -d id: "profile_v0" \
-  -d name: "profile" \
-  -d schema: {
-    "id": "profile_v0",
-    "name": "profile",
-    "schema": {
-        "$schema": "http://json-schema.org/draft-06/schema#",
-        "$ref": "#/definitions/profile_v0",
-        "definitions": {
-            "profile_v0": {
-                "type": "object",
-                "additionalProperties": {},
-                "properties": {
-                    "name": {
-                        "type": "string"
+    -H Authorization: "Bearer ${API_KEY}" \
+    -d provider_id: "${PROVIDER_ID}" \
+    -d provider_address: "${PROVIDER_ADDRESS}" \
+    -d id: "profile_v0" \
+    -d name: "profile" \
+    -d schema: {
+        "id": "profile_v0",
+        "name": "profile",
+        "schema": {
+            "$schema": "http://json-schema.org/draft-06/schema#",
+            "$ref": "#/definitions/profile_v0",
+            "definitions": {
+                "profile_v0": {
+                    "type": "object",
+                    "additionalProperties": {},
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "image": {
+                            "type": "string"
+                        }
                     },
-                    "image": {
-                        "type": "string"
-                    }
-                },
-                "required": [
-                    "name",
-                    "image"
-                ],
-                "title": "profile_v0",
-                "description": "Your core prfile data."
+                    "required": [
+                        "name",
+                        "image"
+                    ],
+                    "title": "profile_v0",
+                    "description": "Your core prfile data."
+                }
             }
         }
     }
-}
 ```
 
 > The above command returns JSON structured like below:
@@ -297,9 +304,9 @@ Basin.api.standards.all.getStandards { result in
 
 ```shell
 curl "api.openbasin.io/datastore/standards/all/standards" \
-  -H Authorization: "Bearer ${API_KEY}" \
-  -d provider_id="${PROVIDER_ID}" \
-  -d provider_address="${PROVIDER_ADDRESS}"
+    -H Authorization: "Bearer ${API_KEY}" \
+    -d provider_id="${PROVIDER_ID}" \
+    -d provider_address="${PROVIDER_ADDRESS}"
 ```
 
 > The above command returns JSON structured like below:
@@ -355,10 +362,10 @@ Basin.api.standard("profile_v0").getStandard { result in
 
 ```shell
 curl "api.openbasin.io/*" \
-  -H Authorization: "Bearer ${API_KEY}" \
-  -d provider_id: "${PROVIDER_ID}" \ \
-  -d provider_address: "${PROVIDER_ADDRESS}" \
-  -d id: "profile_v0"
+    -H Authorization: "Bearer ${API_KEY}" \
+    -d provider_id: "${PROVIDER_ID}" \ \
+    -d provider_address: "${PROVIDER_ADDRESS}" \
+    -d id: "profile_v0"
 ```
 
 > The above command returns JSON structured like this:
@@ -408,9 +415,127 @@ Buckets are sets of data that conform to a set of whitelisted standards and serv
 
 ## Mint Bucket
 
-## Update Bucket
+```javascript
+import basin from './basin.js';
 
-## Read Buckets
+await basin.mint.bucket(
+    "public_profiles",
+    "Your Profiles",
+    "Your public profile to be used on other apps."
+    ["profile_v0"]
+);
+```
+
+```swift
+import OpenBasin
+
+Basin.mint.bucket(id: "public_profiles",
+                  name: "Your Profiles",
+                  description: "Your public profile to be used on other apps.",
+                  standards: ["profile_v0"]) { result in
+    switch result {
+    case .success(let response)
+        print(response)
+    case .error(let error)
+        print(error)
+    }
+}
+```
+
+```shell
+curl "api.openbasin.io/datastore/bucket/mint" \
+    -H Authorization: "Bearer ${API_KEY}" \
+    -d provider_id: "${PROVIDER_ID}" \
+    -d provider_address: "${PROVIDER_ADDRESS}" \
+    -d id: "public_profiles" \
+    -d name: "Your Profiles" \
+    -d description: "Your public profile to be used on other apps." \
+    -d standards: ["profile_v0"]
+```
+
+> The above command returns JSON structured like below:
+
+```json
+{
+  "status": "success"
+}
+```
+
+Creates a Bucket and stores on Open Basin
+
+### HTTP Request
+
+`POST api.openbasin.io/datastore/bucket/mint`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+id | The ID of the bucket to mint
+name | The name of the bucket
+description | The description of the bucket
+allowed_standards | The list of whitelisted standards for the bucket
+
+<aside class="success">
+Note — Only the list of allowed standards can be changed.
+</aside>
+
+## Update Bucket Standards
+
+```javascript
+import basin from './basin.js';
+
+await basin.mint.appendStandard(
+    "public_profiles",
+    "profile_v1"
+);
+```
+
+```swift
+import OpenBasin
+
+Basin.mint.appendStandard(to: "public_profiles",
+                          standard: "profile_v1") { result in
+    switch result {
+    case .success(let response)
+        print(response)
+    case .error(let error)
+        print(error)
+    }
+}
+```
+
+```shell
+curl "api.openbasin.io/datastore/bucket/standard/append" \
+    -H Authorization: "Bearer ${API_KEY}" \
+    -d provider_id: "${PROVIDER_ID}" \
+    -d provider_address: "${PROVIDER_ADDRESS}" \
+    -d bucket: "public_profiles" \
+    -d standard: "profile_v1"
+```
+
+> The above command returns JSON structured like below:
+
+```json
+{
+  "status": "success"
+}
+```
+
+Appends a new standard to the bucket's standard whitelist.
+
+### HTTP Request
+
+`POST api.openbasin.io/datastore/bucket/standard/append`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+bucket | The ID of the bucket to update
+standard | The standard to append
+
+## Get Buckets
 
 # Documents
 
