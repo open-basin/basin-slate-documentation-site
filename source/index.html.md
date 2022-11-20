@@ -107,6 +107,7 @@ Owner | Has complete control over their data by providing and revoking permissio
 Provider | Reads and writes data on behalf of the owners. Providers can only work with data as the owners see fit.
 Standard | Valid JSON Schema to enforce a specified data structure. When storing data on Open Basin, all data must be validated against its corresponding standard.
 Bucket | A set of validated data where owners pool data of the same type or category. Buckets enforce specified data standards so providers can expect a consistent structure.
+Document | A wrapper object for the data stored on the ledger that contains document metadata and raw data.
 
 <aside class="notice">For more information or clarity, join our <a href="https://discord.com/invite/M3NdGXgS">Discord server</a> to chat with us.</aside>
 
@@ -385,17 +386,54 @@ Parameter | Description
 --------- | -----------
 id | The ID of the standard to retrieve
 
-
-<aside class="warning">This documentation site is a work in progress, please reach out to the <code>&lt;maintainers&gt;</code> for more information.</aside>
-
 # Buckets
 
-## Mint Buckets
+Buckets are sets of data that conform to a set of whitelisted standards and serve the same purpose.
+
+### Properties
+
+`id: string` - A unique identifier
+
+`minter: address` - The address of the provider that minted the bucket
+
+`name: string` - The name of the bucket
+
+`description: string` - The description of the data the bucket holds
+
+`timestamp: date` - The date and time at which the bucket was minted
+
+`allowed_standards: string[]` - The set of whitelisted standards that the bucket dat must conform to
+
+<aside class="notice">View deployed buckets on the <a href="https://dashboard.openbasin.io/buckets">Open Basin dashboard</a>.</aside>
+
+## Mint Bucket
+
+## Update Bucket
 
 ## Read Buckets
 
-# Data
+# Documents
 
-## Mint Data
+Documents are wrapper objects for raw data to hold the metadata of the data. They are stored within buckets and conform to a specified standard
 
-## Read Data
+### Properties
+
+`token: integer` - The token index of the document within its bucket
+
+`owners: address[]` - The set of owners of the document
+
+`standard: string` - The standard id that the data conforms to
+
+`bucket: string` - The bucket id that the document is stored in
+
+`timestamp: date` - The date and time at which the document was minted
+
+`data: JSON` - THe raw data of the document
+
+## Mint Document
+
+## Update Document
+
+## Read Document
+
+<aside class="warning">This documentation site is a work in progress, please reach out to the <code>&lt;maintainers&gt;</code> for more information.</aside>
