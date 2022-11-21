@@ -113,16 +113,116 @@ Document | A wrapper object for the data stored on the ledger that contains docu
 
 # Authentication
 
-> Will use User Profile for examples:
-
+> Using **User Profile** as example:
 
 In order to interact with data on Open Basin, owners must allow you to do so.
 
 ## Request Permissions
 
-## Remove Permissions
+```javascript
+import basin from './basin.js';
+
+await basin.auth.request.bucket("public_profiles", "${OWNER_ADDRESS}");v
+```
+
+```swift
+import OpenBasin
+
+Basin.auth
+    .request
+    .owner("${OWNER_ADDRESS}")
+    .bucket(in: "public_profiles") { result in
+        switch result {
+        case .success(let permissions):
+            print(permissions)
+        case .error(let error):
+            print(error)
+        }
+    }
+```
+
+```shell
+Permission methods are note supported via Shell
+```
+> The above command returns JSON structured like below:
+
+```json
+{
+    "status": bool
+}
+```
+
+Requests access to an owner's data in a specified bucket.
+
+The user will be directed to an Open Basin web page to execute the authorization.
+
+### Parameters
+
+Parameter | Description
+--------- | -----------
+owner | The address of the owner
+bucket | The id of the bucket
+provider_address | The address of the requestor
+
+<aside class="success">
+Note — Permission can be revoked at any time.
+</aside>
 
 ## Check Permissions
+
+```javascript
+import basin from './basin.js';
+
+const permitted = await basin.auth.permissions.bucket("public_profiles", "${OWNER_ADDRESS}");
+
+console.log(permitted);
+```
+
+```swift
+import OpenBasin
+
+Basin.auth
+    .permissions
+    .owner("${OWNER_ADDRESS}")
+    .bucket(in: "public_profiles") { result in
+        switch result {
+        case .success(let permissions):
+            print(permissions)
+        case .error(let error):
+            print(error)
+        }
+    }
+```
+
+```shell
+curl "api.openbasin.io/datastore/standards/all/standards" \
+    -H Authorization: "Bearer ${API_KEY}" \
+    -d provider_id: "${PROVIDER_ID}" \
+    -d provider_address: "${PROVIDER_ADDRESS}" \
+    -d owner: "${OWNER_ADDRESS}" \
+    -d bucket: "public_profiles"
+```
+> The above command returns JSON structured like below:
+
+```json
+{
+    "status": bool
+}
+```
+
+Checks if the requesting provider has permissions to an owner's data in a specified bucket.
+
+### HTTP Request
+
+`GET api.openbasin.io/datastore/auth/bucket/permissions`
+
+### Parameters
+
+Parameter | Description
+--------- | -----------
+owner | The address of the owner
+bucket | The id of the bucket
+provider_address | The address of the requestor
 
 # Standards
 
@@ -305,8 +405,8 @@ Basin.api.standards.getAllStandards { result in
 ```shell
 curl "api.openbasin.io/datastore/standards/all/standards" \
     -H Authorization: "Bearer ${API_KEY}" \
-    -d provider_id="${PROVIDER_ID}" \
-    -d provider_address="${PROVIDER_ADDRESS}"
+    -d provider_id: "${PROVIDER_ID}" \
+    -d provider_address: "${PROVIDER_ADDRESS}"
 ```
 
 > The above command returns JSON structured like below:
@@ -561,8 +661,8 @@ Basin.api.buckets.getAll { result in
 ```shell
 curl "api.openbasin.io/datastore/buckets/all" \
     -H Authorization: "Bearer ${API_KEY}" \
-    -d provider_id="${PROVIDER_ID}" \
-    -d provider_address="${PROVIDER_ADDRESS}"
+    -d provider_id: "${PROVIDER_ID}" \
+    -d provider_address: "${PROVIDER_ADDRESS}"
 ```
 
 > The above command returns JSON structured like below:
