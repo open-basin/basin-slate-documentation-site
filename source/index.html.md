@@ -8,6 +8,7 @@ language_tabs: # must be one of https://git.io/vQNgJ
 
 toc_footers:
   - <a href='https://dashboard.openbasin.io'>Sign Up for Developer Keys</a>
+  - <a href='https://github.com/open-basin'>Visit our GitHub</a>
 
 includes:
   - errors
